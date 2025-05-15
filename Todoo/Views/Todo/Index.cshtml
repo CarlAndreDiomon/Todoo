@@ -1,0 +1,144 @@
+﻿@model List<TodoItem>
+@{
+    ViewData["Title"] = "To-Do List";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<h1 class="text-center mb-4">To-Do List</h1>
+
+<div class="container-fluid" style="width:100%">
+    <div class="row">
+        <!-- Todo List Table -->
+        <div class="col-md-9">
+            <h3 class="text-center mb-3">Todo List</h3>
+            <table class="table table-bordered table-striped align-middle" style="width: 100%">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Deadline</th>
+                        <th>Completed</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <form asp-action="Update" method="post">
+                    <tr data-id="@item.Id">
+                        <input type="hidden" name="Id" value="@item.Id" />
+                        <td>
+                            <span class="view-mode form-control" style="width: 180px">@item.Title</span>
+                            <input class="edit-mode form-control" name="Title" value="@item.Title" style="display:none" />
+                        </td>
+                        <td>
+                            <span class="view-mode form-control" style="width: 180px">@item.Description</span>
+                            <input class="edit-mode form-control" name="Description" value="@item.Description" style="display:none" />
+                        </td>
+                        <td>
+                            <span class="view-mode form-control" style="width: 180px"> @item.Deadline.ToString("yyyy-MM-dd HH:mm")</span>
+                            <input class="edit-mode form-control" name="Deadline" type="datetime-local" value="@item.Deadline.ToString("yyyy-MM-ddTHH:mm")" style="display:none" />
+                        </td>
+                        <td class="text-center">
+                            <span class="view-mode">
+                                @Html.Raw(item.IsCompleted
+                                                                ? "<span class='badge bg-success'>&#10003;</span>"
+                                                                : "<span class='badge bg-secondary'>&#10007;</span>")
+                            </span>
+                            <div class="edit-mode" style="display:none">
+                                <input type="hidden" name="IsCompleted" value="@item.IsCompleted.ToString().ToLower()" />
+                                <input type="checkbox" class="form-check-input" onchange="this.previousElementSibling.value = this.checked.toString()" @(item.IsCompleted ? "checked" : "") />
+                            </div>
+                        </td>
+                        <td>
+                            <div class="view-mode">
+                                @if (!item.IsCompleted)
+                                    {
+                                        <button type="button" class="btn btn-success btn-sm" onclick="completeTask(this)">Complete</button>
+                                    }
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="enableEdit(this)">Edit</button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete(@item.Id)">Delete</button>
+                                </div>
+                                <div class="edit-mode" style="display:none">
+                                    <button type="submit" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="cancelEdit(this)">Cancel</button>
+                                </div>
+                            </td>
+                        </tr>
+                        </form>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Add Task Form -->
+        <div class="col-md-3">
+            <h3 class="text-center mb-3">Add Task</h3>
+            <form asp-action="Add" method="post" class="bg-light p-4 rounded shadow-sm">
+                <div class="mb-3">
+                    <label for="Title" class="form-label">Task</label>
+                    <input name="Title" class="form-control" placeholder="Enter Task" required />
+                </div>
+                <div class="mb-3">
+                    <label for="Description" class="form-label">Description</label>
+                    <input name="Description" class="form-control" placeholder="Enter Description" />
+                </div>
+                <div class="mb-3">
+                    <label for="Deadline" class="form-label">Deadline</label>
+                    <input name="Deadline" type="datetime-local" class="form-control" required />
+                </div>
+                <button type="submit" class="btn btn-success w-100">Add Task</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Popup -->
+<div id="deleteConfirmModal" style="display:none; position:fixed; top:30%; left:50%; transform:translateX(-50%); z-index:1050; background:#fff; border:1px solid #ccc; padding:2rem; border-radius:8px;">
+    <form method="post" asp-action="Delete">
+        <input type="hidden" id="deleteId" name="id" />
+        <p>Are you sure you want to delete this task?</p>
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <button type="button" class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function enableEdit(button) {
+            let tr = button.closest("tr");
+            tr.querySelectorAll(".view-mode").forEach(e => e.style.display = "none");
+            tr.querySelectorAll(".edit-mode").forEach(e => e.style.display = "");
+        }
+
+        function cancelEdit(button) {
+            let tr = button.closest("tr");
+            tr.querySelectorAll(".edit-mode").forEach(e => e.style.display = "none");
+            tr.querySelectorAll(".view-mode").forEach(e => e.style.display = "");
+        }
+
+        function confirmDelete(id) {
+            document.getElementById("deleteId").value = id;
+            document.getElementById("deleteConfirmModal").style.display = "block";
+        }
+
+        function closeDeleteModal() {
+            document.getElementById("deleteConfirmModal").style.display = "none";
+        }
+
+        function completeTask(button) {
+            let tr = button.closest("tr");
+            // Show edit mode to reveal checkbox
+            tr.querySelectorAll(".view-mode").forEach(e => e.style.display = "none");
+            tr.querySelectorAll(".edit-mode").forEach(e => e.style.display = "");
+            // Find and check the checkbox
+            let checkbox = tr.querySelector("input[type='checkbox']");
+            if (checkbox) {
+                checkbox.checked = true;
+                // Update the hidden input value
+                checkbox.previousElementSibling.value = "true";
+            }
+        }
+    </script>
+}

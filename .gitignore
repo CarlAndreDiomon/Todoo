@@ -1,0 +1,4 @@
+﻿obj/
+bin/
+# Ignore Visual Studio folder
+.vs/

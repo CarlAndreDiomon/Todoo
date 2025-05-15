@@ -54,7 +54,23 @@ A simple task management application built using ASP.NET Core MVC (.NET 8), with
 	- Solution
 		- Fix Incorrect Syntax
 
+
+### Day 3
+	- Problem Encounter
+		-Visual Studio 2022 Dependencies error
+		- Scaffolded error can't create
+	- Solution
+		- Install All dependencies even if out support and it suddenly work
+
+
+### Day 4
+	Started The Todolist MVC using CRUD operations
+
+	Problem Encountter
+		- Add task Issue
 ---
+
+
 
 ## 📁 Notes
 This is a learning project aimed at improving our understanding of:

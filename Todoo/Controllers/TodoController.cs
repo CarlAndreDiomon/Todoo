@@ -31,14 +31,22 @@ public class TodoController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(TodoItem item)
     {
+        // Set UserId before validation
+        item.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         if (ModelState.IsValid)
         {
-            item.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            item.IsCompleted = false; // Default to not completed
+            item.IsCompleted = false;
             _context.TodoItems.Add(item);
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
-        return RedirectToAction(nameof(Index));
+
+        // If invalid, reload the view with errors
+        var items = await _context.TodoItems
+            .Where(t => t.UserId == item.UserId)
+            .ToListAsync();
+        return View("Index", items);
     }
 
     // Update existing to-do
@@ -46,9 +54,6 @@ public class TodoController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Update(TodoItem item)
     {
-        if (!ModelState.IsValid)
-            return RedirectToAction(nameof(Index));
-
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         var existingItem = await _context.TodoItems.FindAsync(item.Id);
 
@@ -57,6 +62,7 @@ public class TodoController : Controller
 
         existingItem.Title = item.Title;
         existingItem.Description = item.Description;
+        existingItem.Deadline = item.Deadline;
         existingItem.IsCompleted = item.IsCompleted;
 
         await _context.SaveChangesAsync();
@@ -79,4 +85,5 @@ public class TodoController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
 }
