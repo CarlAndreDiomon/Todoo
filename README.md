@@ -3,6 +3,15 @@ A simple task management application built using ASP.NET Core MVC (.NET 8), with
 
 ---
 
+## ✨ Features
+
+- User registration and login
+- Add, edit, delete, and view tasks
+- Secure authentication using ASP.NET Identity
+- SQL Server database integration
+- Entity Framework Core for data operations
+
+
 ## 🔧 Tech Stack
 - Frontend & Backend: ASP.NET Core Web App (Model-View-Controller)
 - Database: SQL Server  
@@ -69,6 +78,15 @@ A simple task management application built using ASP.NET Core MVC (.NET 8), with
 	Problem Encountter
 		- Add task Issue
 ---
+
+
+
+## 🖼 Add a Screenshot
+
+Add some screenshots or GIFs here to showcase the UI.
+
+[![Add Image](https://img.shields.io/badge/Add_Image-Click_Here-brightgreen?style=for-the-badge)](https://github.com/your-repo/issues/new)
+
 
 
 
